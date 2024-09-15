@@ -69,8 +69,7 @@ def clear_bit_at_position(binary_num, pos):
 
     return binary_num & mask
 
-
-print_borders(board)
+# cal possible
 for x in range(9):
     for y in range(9):
         if possible[x][y][0] >0:
@@ -85,4 +84,5 @@ for x in range(9):
                     possible[x][y][0]=clear_bit_at_position(possible[x][y][0],(box-1))
             possible[x][y][1]=(bin(possible[x][y][0]).count('1'))-1
 
+print_borders(board)
 print_borders(possible,2)
