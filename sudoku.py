@@ -36,6 +36,8 @@ def print_borders(board,base=10):
                 number = board[i][j]
                 if number == 0 :
                     row_to_print += Fore.BLACK + "0 "  # Red for empty spaces
+                elif number <0:
+                    row_to_print += Fore.RED + str(number*-1) + " "  # Red for empty spaces
                 else:
                     row_to_print += Fore.WHITE + str(number) + " "
 
@@ -69,20 +71,63 @@ def clear_bit_at_position(binary_num, pos):
 
     return binary_num & mask
 
-# cal possible
-for x in range(9):
-    for y in range(9):
-        if possible[x][y][0] >0:
-            for col in board[x]:
-                if col != 0:
-                    possible[x][y][0]=clear_bit_at_position(possible[x][y][0],(col-1))
-            for row in rows[y]:
-                if row != 0:
-                    possible[x][y][0]=clear_bit_at_position(possible[x][y][0],(row-1))
-            for box in boxes[(((x)//3)*3)+(y)//3]:
-                if box != 0:
-                    possible[x][y][0]=clear_bit_at_position(possible[x][y][0],(box-1))
-            possible[x][y][1]=(bin(possible[x][y][0]).count('1'))-1
 
-print_borders(board)
+# cal possible
+def calpossible():
+    min_value = float('inf')
+    min_indexes = None
+    for x in range(9):
+        for y in range(9):
+            if possible[x][y][0] >0:
+                for num in board[x]:
+                    if num < 0:
+                        num=num*-1
+                    if num != 0:
+                        possible[x][y][0]=clear_bit_at_position(possible[x][y][0],(num-1))
+                for num in rows[y]:
+                    if num < 0:
+                        num=num*-1
+                    if num != 0:
+                        possible[x][y][0]=clear_bit_at_position(possible[x][y][0],(num-1))
+                for num in boxes[(((x)//3)*3)+(y)//3]:
+                    if num < 0:
+                        num=num*-1
+                    if num != 0:
+                        possible[x][y][0]=clear_bit_at_position(possible[x][y][0],(num-1))
+                possible[x][y][1]=(bin(possible[x][y][0]).count('1'))-1
+                if possible[x][y][1] < min_value:
+                    min_value = possible[x][y][1]
+                    min_indexes = (y, x)
+    return min_value,min_indexes
+
+def fillbox(min_value,min_indexes):
+    if min_value==1:
+        #board[min_indexes[1]][min_indexes[0]]
+        first_one_index = bin(possible[min_indexes[1]][min_indexes[0]][0])[2:].find('1', 1)
+        board[min_indexes[1]][min_indexes[0]]=-1*(10-first_one_index)
+        rows[min_indexes[0]][min_indexes[1]]=-1*(10-first_one_index)
+        boxes[(((min_indexes[1])//3)*3)+(min_indexes[0])//3][(((min_indexes[0])//3)*3)+(min_indexes[1])//3]=-1*(10-first_one_index)
+        possible[min_indexes[1]][min_indexes[0]]=[-1,10]
+
+def solve(x=1,printall=False):
+    for i in range(x):
+        min_value,min_indexes=calpossible()
+        fillbox(min_value,min_indexes)
+        if printall:
+            print_borders(board)
+    if not printall:
+        print_borders(board)
+
+
+solve(6,False)
 print_borders(possible,2)
+
+
+'''
+print(f"The minimum value is at index: {min_indexes[0]+1},{min_indexes[1]+1}")
+print(f"The corresponding sublist is: {possible[min_indexes[1]][min_indexes[0]]}")
+print_borders(possible,2)
+print(min_indexes[0],min_indexes[1])
+print((((min_indexes[1])//3)*3)+(min_indexes[0])//3,(((min_indexes[0])//3)*3)+(min_indexes[1])//3)
+print(boxes[(((min_indexes[1])//3)*3)+(min_indexes[0])//3])
+'''
