@@ -100,14 +100,47 @@ def calpossible():
                     min_indexes = (y, x)
     return min_value,min_indexes
 
+def fill(number,x,y):
+    board[x][y]=number
+    rows[y][x]=number
+    boxes[x//3*3+y//3][y%3*3+x%3]=number
+    possible[x][y]=[-1,10]
+
 def fillbox(min_value,min_indexes):
     if min_value==1:
         #board[min_indexes[1]][min_indexes[0]]
         first_one_index = bin(possible[min_indexes[1]][min_indexes[0]][0])[2:].find('1', 1)
-        board[min_indexes[1]][min_indexes[0]]=-1*(10-first_one_index)
-        rows[min_indexes[0]][min_indexes[1]]=-1*(10-first_one_index)
-        boxes[(((min_indexes[1])//3)*3)+(min_indexes[0])//3][(((min_indexes[0])//3)*3)+(min_indexes[1])//3]=-1*(10-first_one_index)
-        possible[min_indexes[1]][min_indexes[0]]=[-1,10]
+        number=-1*(10-first_one_index)
+        x=min_indexes[1]
+        y=min_indexes[0]
+        fill(number,x,y)
+
+    elif min_value>1:
+
+        for a in range(9):
+            blist=[]
+            search=possible[a]
+            for x in search:
+                if x[0] != -1:
+                    blist.append(x[0])
+            if len(blist)>0:
+                max_bits = max(number.bit_length() for number in blist)
+                bit_counts = [0] * max_bits
+                only_fill = [-1] * max_bits
+                pos=0
+                for number in blist:
+                    for bit_position in range(max_bits):
+                        if (number >> bit_position) & 1:
+                            bit_counts[bit_position*-1-1] += 1
+                            only_fill[bit_position*-1-1]=pos
+                    pos+=1
+                for x in range(1,10):
+                    if bit_counts[x]==1:
+                        for i in range(len(search)):
+                            if search[i][0] == blist[only_fill[x]]:
+                                fill((10-x)*-1,a,i)
+
+
 
 def solve(x=1,printall=False):
     for i in range(x):
@@ -119,11 +152,28 @@ def solve(x=1,printall=False):
         print_borders(board)
 
 
-solve(6,False)
-print_borders(possible,2)
+
+
+
+print_borders(board)
+min_value,min_indexes=calpossible()
+fillbox(2,(min_indexes))
+print_borders(board)
+
+solve(45)
 
 
 '''
+print("~~~~~~~~")
+print(board)
+print("~~~~~~~~")
+print(rows)
+print("~~~~~~~~")
+print(boxes)
+print(possible)
+print_borders(possible,2)
+
+
 print(f"The minimum value is at index: {min_indexes[0]+1},{min_indexes[1]+1}")
 print(f"The corresponding sublist is: {possible[min_indexes[1]][min_indexes[0]]}")
 print_borders(possible,2)

@@ -12,3 +12,4 @@ def input():
     ]
 
     return arr
+
