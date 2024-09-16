@@ -152,16 +152,32 @@ def solve(x=1,printall=False):
         print_borders(board)
 
 
+def scancorrect():
+    rows = [[col[i] for col in board] for i in range(len(board))]
+    boxes = [[] for _ in range(9)]
+    for row in range(9):
+        for col in range(9):
+            box_index = (row // 3) * 3 + (col // 3)
+            boxes[box_index].append(board[row][col])
 
+    def check_groups(groups):
+        for group in groups:
+            a = 511
+            for num in group:
+                a = clear_bit_at_position(a, (abs(num) - 1))
+            if a != 0:
+                return False
+        return True
 
+    return check_groups(board) and check_groups(rows) and check_groups(boxes)
 
-print_borders(board)
 min_value,min_indexes=calpossible()
 fillbox(2,(min_indexes))
-print_borders(board)
 
 solve(45)
 
+if scancorrect():
+    print("Congrat!!")
 
 '''
 print("~~~~~~~~")
