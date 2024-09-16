@@ -174,7 +174,7 @@ def scancorrect():
 min_value,min_indexes=calpossible()
 fillbox(2,(min_indexes))
 
-solve(45)
+solve(50)
 
 if scancorrect():
     print("Congrat!!")
